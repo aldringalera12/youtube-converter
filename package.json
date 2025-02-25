@@ -4,7 +4,7 @@
   "description": "YouTube to MP3/MP4 converter",
   "main": "server.js",
   "scripts": {
-    "install-yt-dlp": "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp && chmod a+rx yt-dlp",
+    "install-yt-dlp": "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp && chmod a+x yt-dlp",
     "start": "node server.js"
   },
   "dependencies": {

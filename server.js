@@ -8,7 +8,7 @@ const app = express();
 const PORT = 3000;
 
 // Set absolute path for yt-dlp
-const YT_DLP_PATH = path.join(__dirname, 'yt-dlp');
+const YT_DLP_PATH = path.resolve('./yt-dlp');
 
 // Use '/tmp/downloads' since Render has ephemeral storage
 const OUTPUT_DIR = '/tmp/downloads';
@@ -19,10 +19,16 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 }
 
 // Log yt-dlp version to check if it works
-exec(`${YT_DLP_PATH} --version`, (error, stdout, stderr) => {
+exec(`${YT_DLP_PATH} --get-title ${url}`, (error, stdout, stderr) => {
+    console.log("Executing:", `${YT_DLP_PATH} --get-title ${url}`);
+    console.log("stdout:", stdout);
+    console.log("stderr:", stderr);
+
     if (error) {
-        console.error("yt-dlp not found or failed to run:", stderr);
-    } else {
+        console.error("Error getting video title:", stderr);
+        return res.status(500).json({ error: 'Failed to get video title', details: stderr });
+    }
+ else {
         console.log("yt-dlp version:", stdout.trim());
     }
 });
@@ -56,9 +62,9 @@ app.post('/convert', (req, res) => {
         // Select correct command for MP3 or MP4
         let command;
         if (format === 'mp3') {
-            command = `${YT_DLP_PATH} -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
+            command = `./yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
         } else if (format === 'mp4') {
-            command = `${YT_DLP_PATH} -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4] -o "${outputPath}" ${url}`;
+            command = `./yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
         }
 
         // Execute the conversion
