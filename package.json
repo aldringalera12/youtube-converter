@@ -4,9 +4,10 @@
   "description": "YouTube to MP3/MP4 converter",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "install-yt-dlp": "curl -sSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp && chmod +x yt-dlp"
-  },
+  "install-yt-dlp": "curl -sSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp && chmod +x yt-dlp",
+  "install-ffmpeg": "apt-get update && apt-get install -y ffmpeg",
+  "start": "npm run install-ffmpeg && node server.js"
+},
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2"

@@ -7,16 +7,29 @@ const fs = require('fs');
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from 'public'
+// Set absolute path for yt-dlp
+const YT_DLP_PATH = path.join(__dirname, 'yt-dlp');
 
-const OUTPUT_DIR = path.join(__dirname, 'public/downloads'); // Store files in 'public/downloads'
+// Use '/tmp/downloads' since Render has ephemeral storage
+const OUTPUT_DIR = '/tmp/downloads';
 
 // Ensure the downloads folder exists
 if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 }
+
+// Log yt-dlp version to check if it works
+exec(`${YT_DLP_PATH} --version`, (error, stdout, stderr) => {
+    if (error) {
+        console.error("yt-dlp not found or failed to run:", stderr);
+    } else {
+        console.log("yt-dlp version:", stdout.trim());
+    }
+});
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
 // YouTube conversion route
 app.post('/convert', (req, res) => {
@@ -26,7 +39,7 @@ app.post('/convert', (req, res) => {
     }
 
     // Fetch video title
-    exec(`yt-dlp --get-title ${url}`, (error, stdout, stderr) => {
+    exec(`${YT_DLP_PATH} --get-title ${url}`, (error, stdout, stderr) => {
         if (error) {
             return res.status(500).json({ error: 'Failed to get video title', details: stderr });
         }
@@ -43,9 +56,9 @@ app.post('/convert', (req, res) => {
         // Select correct command for MP3 or MP4
         let command;
         if (format === 'mp3') {
-            command = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
+            command = `${YT_DLP_PATH} -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
         } else if (format === 'mp4') {
-            command = `yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4] -o "${outputPath}" ${url}`;
+            command = `${YT_DLP_PATH} -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4] -o "${outputPath}" ${url}`;
         }
 
         // Execute the conversion
@@ -63,7 +76,7 @@ app.post('/convert', (req, res) => {
     });
 });
 
-// Route to serve downloads and delete after download
+// Route to serve downloads
 app.get('/download/:filename', (req, res) => {
     const filename = decodeURIComponent(req.params.filename);
     const filePath = path.join(OUTPUT_DIR, filename);
