@@ -25,19 +25,14 @@ exec(`${YT_DLP_PATH} --version`, (error, stdout, stderr) => {
     } else {
         console.log("yt-dlp version:", stdout.trim());
     }
-
-    if (error) {
-        console.error("Error getting video title:", stderr);
-        return res.status(500).json({ error: 'Failed to get video title', details: stderr });
-    }
- else {
-        console.log("yt-dlp version:", stdout.trim());
-    }
 });
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
+
+// Define BASE_URL for absolute download links
+const BASE_URL = "https://youtube-converter-51vz.onrender.com/"; // Replace with your actual Render URL
 
 // YouTube conversion route
 app.post('/convert', (req, res) => {
@@ -47,7 +42,7 @@ app.post('/convert', (req, res) => {
     }
 
     // Fetch video title
-    exec(`${YT_DLP_PATH} --get-title ${url}`, (error, stdout, stderr) => {
+    exec(`${YT_DLP_PATH} --get-title "${url}"`, (error, stdout, stderr) => {
         if (error) {
             return res.status(500).json({ error: 'Failed to get video title', details: stderr });
         }
@@ -64,9 +59,9 @@ app.post('/convert', (req, res) => {
         // Select correct command for MP3 or MP4
         let command;
         if (format === 'mp3') {
-            command = `./yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
+            command = `./yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" "${url}"`;
         } else if (format === 'mp4') {
-            command = `./yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" ${url}`;
+            command = `./yt-dlp -f best -o "${outputPath}" "${url}"`;
         }
 
         // Execute the conversion
@@ -78,7 +73,7 @@ app.post('/convert', (req, res) => {
             res.json({ 
                 title: title, 
                 youtubeUrl: url,
-                downloadUrl: `/download/${encodeURIComponent(outputFilename)}` 
+                downloadUrl: `${BASE_URL}/download/${encodeURIComponent(outputFilename)}`
             });
         });
     });
