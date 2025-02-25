@@ -35,7 +35,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 20px 10px;
         }
         
         .container {
@@ -44,7 +44,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 30px;
+            padding: 30px 20px;
             margin-top: 20px;
         }
         
@@ -54,24 +54,26 @@
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
             color: var(--primary);
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         h1 i {
-            font-size: 2rem;
+            font-size: clamp(1.6rem, 4vw, 2rem);
         }
         
         .description {
             color: var(--gray);
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
             max-width: 600px;
             margin: 0 auto 20px;
+            padding: 0 10px;
         }
         
         .input-group {
@@ -94,6 +96,7 @@
             border-radius: var(--border-radius);
             font-size: 1rem;
             transition: var(--transition);
+            width: 100%;
         }
         
         #url:focus {
@@ -112,6 +115,8 @@
         .format-selector {
             display: flex;
             gap: 10px;
+            flex-direction: row;
+            flex-wrap: wrap;
             justify-content: center;
             margin-bottom: 15px;
         }
@@ -127,6 +132,9 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex: 1;
+            min-width: 150px;
+            justify-content: center;
         }
         
         .format-option.active {
@@ -136,7 +144,7 @@
         }
         
         #convertBtn {
-            display: block;
+            display: flex;
             width: 100%;
             padding: 15px;
             background-color: var(--success);
@@ -147,7 +155,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
@@ -173,13 +180,15 @@
         
         .progress-ring-container {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: clamp(80px, 30vw, 120px);
+            height: clamp(80px, 30vw, 120px);
         }
         
         .progress-ring {
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
+            width: 100%;
+            height: 100%;
         }
         
         .progress-ring-circle {
@@ -193,21 +202,22 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1.8rem;
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
             font-weight: bold;
             color: var(--primary);
         }
         
         .progress-text {
             margin-top: 15px;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 3vw, 1rem);
             color: var(--gray);
             text-align: center;
+            padding: 0 10px;
         }
         
         #thumbnail {
             margin: 25px auto;
-            max-width: 500px;
+            max-width: 100%;
             display: none;
             animation: fadeIn 0.5s ease;
         }
@@ -222,6 +232,8 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--box-shadow);
+            max-width: 500px;
+            margin: 0 auto;
         }
         
         #thumbImg {
@@ -246,7 +258,7 @@
         }
         
         .play-icon {
-            font-size: 3rem;
+            font-size: clamp(2rem, 8vw, 3rem);
             color: white;
         }
         
@@ -257,9 +269,10 @@
         #download {
             text-align: center;
             margin-top: 20px;
-            padding: 20px;
+            padding: 20px 10px;
             border-radius: var(--border-radius);
             animation: fadeIn 0.5s ease;
+            word-wrap: break-word;
         }
         
         .download-success {
@@ -276,6 +289,7 @@
             font-weight: 600;
             margin-bottom: 10px;
             word-break: break-word;
+            font-size: clamp(0.9rem, 3vw, 1rem);
         }
         
         .download-link {
@@ -298,40 +312,64 @@
         .error-message {
             color: #dc3545;
             font-weight: 600;
+            font-size: clamp(0.9rem, 3vw, 1rem);
         }
         
         footer {
             margin-top: 40px;
             text-align: center;
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            padding: 0 10px;
+            width: 100%;
         }
         
-        @media (max-width: 768px) {
+        /* Additional media queries for better responsiveness */
+        @media (max-width: 480px) {
             .container {
-                padding: 20px;
+                padding: 15px;
             }
             
-            h1 {
-                font-size: 2rem;
+            #url {
+                padding: 12px;
+                padding-left: 35px;
+                font-size: 0.9rem;
             }
             
-            .format-selector {
-                flex-direction: column;
+            .url-icon {
+                left: 12px;
+            }
+            
+            #convertBtn {
+                padding: 12px;
+                font-size: 0.95rem;
             }
             
             .format-option {
-                width: 100%;
-                justify-content: center;
+                padding: 8px 15px;
+                min-width: 120px;
             }
             
-            .progress-ring-container {
-                width: 100px;
-                height: 100px;
+            .download-link {
+                padding: 10px 20px;
+            }
+        }
+        
+        /* Adjust for tiny screens */
+        @media (max-width: 320px) {
+            .container {
+                padding: 10px;
             }
             
-            .percentage-text {
-                font-size: 1.5rem;
+            .format-option {
+                min-width: 100%;
+            }
+        }
+        
+        /* Adjust for large screens */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 900px;
             }
         }
     </style>
@@ -374,7 +412,7 @@
         
         <div class="loader-container" id="loaderContainer">
             <div class="progress-ring-container">
-                <svg class="progress-ring" width="120" height="120">
+                <svg class="progress-ring" viewBox="0 0 120 120">
                     <circle
                         class="progress-ring-circle-bg"
                         stroke="#e6e6e6"
