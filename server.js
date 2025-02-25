@@ -37,13 +37,18 @@ const BASE_URL = "https://youtube-converter-51vz.onrender.com/"; // Replace with
 // YouTube conversion route
 app.post('/convert', (req, res) => {
     const { url, format } = req.body;
+
     if (!url || !format || !['mp3', 'mp4'].includes(format)) {
+        console.error("❌ Invalid request data:", req.body);
         return res.status(400).json({ error: 'Missing or invalid URL/format' });
     }
+
+    console.log(`🔹 Received request: URL = ${url}, Format = ${format}`);
 
     // Fetch video title
     exec(`${YT_DLP_PATH} --get-title "${url}"`, (error, stdout, stderr) => {
         if (error) {
+            console.error("❌ Failed to get video title:", stderr);
             return res.status(500).json({ error: 'Failed to get video title', details: stderr });
         }
 
@@ -51,33 +56,36 @@ app.post('/convert', (req, res) => {
         const outputFilename = `${title}.${format}`;
         const outputPath = path.join(OUTPUT_DIR, outputFilename);
 
-        // Delete existing file with the same name (if any)
-        if (fs.existsSync(outputPath)) {
-            fs.unlinkSync(outputPath);
-        }
+        console.log(`🔹 Video Title: ${title}`);
 
         // Select correct command for MP3 or MP4
         let command;
         if (format === 'mp3') {
-            command = `./yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" "${url}"`;
+            command = `${YT_DLP_PATH} -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" "${url}"`;
         } else if (format === 'mp4') {
-            command = `./yt-dlp -f best -o "${outputPath}" "${url}"`;
+            command = `${YT_DLP_PATH} -f best -o "${outputPath}" "${url}"`;
         }
+
+        console.log(`🔹 Running command: ${command}`);
 
         // Execute the conversion
         exec(command, (error, stdout, stderr) => {
             if (error) {
+                console.error("❌ Conversion failed:", stderr);
                 return res.status(500).json({ error: 'Conversion failed', details: stderr });
             }
+
+            console.log("✅ Conversion successful:", outputFilename);
 
             res.json({ 
                 title: title, 
                 youtubeUrl: url,
-                downloadUrl: `${BASE_URL}/download/${encodeURIComponent(outputFilename)}`
+                downloadUrl: `/download/${encodeURIComponent(outputFilename)}` 
             });
         });
     });
 });
+
 
 // Route to serve downloads
 app.get('/download/:filename', (req, res) => {
