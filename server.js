@@ -19,10 +19,12 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 }
 
 // Log yt-dlp version to check if it works
-exec(`${YT_DLP_PATH} --get-title ${url}`, (error, stdout, stderr) => {
-    console.log("Executing:", `${YT_DLP_PATH} --get-title ${url}`);
-    console.log("stdout:", stdout);
-    console.log("stderr:", stderr);
+exec(`${YT_DLP_PATH} --version`, (error, stdout, stderr) => {
+    if (error) {
+        console.error("yt-dlp not found or failed to run:", stderr);
+    } else {
+        console.log("yt-dlp version:", stdout.trim());
+    }
 
     if (error) {
         console.error("Error getting video title:", stderr);
