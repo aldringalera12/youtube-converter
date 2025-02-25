@@ -18,6 +18,9 @@ if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 }
 
+// Path to cookies.txt (update this if needed)
+const COOKIES_FILE = path.resolve('./cookies.txt');
+
 // Log yt-dlp version to check if it works
 exec(`${YT_DLP_PATH} --version`, (error, stdout, stderr) => {
     if (error) {
@@ -45,8 +48,8 @@ app.post('/convert', (req, res) => {
 
     console.log(`🔹 Received request: URL = ${url}, Format = ${format}`);
 
-    // Fetch video title
-    exec(`${YT_DLP_PATH} --get-title "${url}"`, (error, stdout, stderr) => {
+    // Fetch video title using yt-dlp with cookies
+    exec(`${YT_DLP_PATH} --cookies ${COOKIES_FILE} --get-title "${url}"`, (error, stdout, stderr) => {
         if (error) {
             console.error("❌ Failed to get video title:", stderr);
             return res.status(500).json({ error: 'Failed to get video title', details: stderr });
@@ -58,12 +61,12 @@ app.post('/convert', (req, res) => {
 
         console.log(`🔹 Video Title: ${title}`);
 
-        // Select correct command for MP3 or MP4
+        // Select correct command for MP3 or MP4 (using cookies)
         let command;
         if (format === 'mp3') {
-            command = `${YT_DLP_PATH} -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" "${url}"`;
+            command = `${YT_DLP_PATH} --cookies ${COOKIES_FILE} -f bestaudio --extract-audio --audio-format mp3 --audio-quality 320K -o "${outputPath}" "${url}"`;
         } else if (format === 'mp4') {
-            command = `${YT_DLP_PATH} -f best -o "${outputPath}" "${url}"`;
+            command = `${YT_DLP_PATH} --cookies ${COOKIES_FILE} -f best -o "${outputPath}" "${url}"`;
         }
 
         console.log(`🔹 Running command: ${command}`);
@@ -85,7 +88,6 @@ app.post('/convert', (req, res) => {
         });
     });
 });
-
 
 // Route to serve downloads
 app.get('/download/:filename', (req, res) => {
