@@ -21,13 +21,26 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 // Path to cookies.txt (update this if needed)
 const COOKIES_FILE = path.resolve('./cookies.txt');
 
-// Log yt-dlp version to check if it works
-exec(`${YT_DLP_PATH} --version`, (error, stdout, stderr) => {
-    if (error) {
-        console.error("yt-dlp not found or failed to run:", stderr);
-    } else {
-        console.log("yt-dlp version:", stdout.trim());
-    }
+// Function to refresh cookies
+const updateCookies = () => {
+    console.log("🔄 Refreshing cookies...");
+
+    exec('python3 fetch_cookies.py', (error, stdout, stderr) => {
+        if (error) {
+            console.error("❌ Failed to refresh cookies:", stderr);
+        } else {
+            console.log("✅ Cookies updated:", stdout.trim());
+        }
+    });
+};
+
+// 🔹 Refresh cookies when the server starts
+updateCookies();
+
+// Middleware to refresh cookies before every download request
+app.use((req, res, next) => {
+    updateCookies();
+    next();
 });
 
 app.use(cors());
@@ -124,5 +137,5 @@ app.get('/download/:filename', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
